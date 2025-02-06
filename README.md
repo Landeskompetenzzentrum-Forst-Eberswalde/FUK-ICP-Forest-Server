@@ -8,14 +8,36 @@ Make sure you have the following installed:
 - [Docker](https://docs.docker.com/engine/install/)
 - [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)
 
-## Getting started
+## Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/Landeskompetenzzentrum-Forst-Eberswalde/FUK-ICP-Forest-Server.git
+```
+
+## Getting started (Local)
+
+```bash
+supabase start
+```
+
+## Getting started (Server)
+
+```bash
+
+# Change into the project directory
+cd FUK-ICP-Forest-Server
 
 # Copy the fake env vars
 cp .env.example .env
+````
+
+Securing the environment variables is important. The `.env` file should never be committed to the repository.
+[Securing your services](https://supabase.com/docs/guides/self-hosting/docker#securing-your-services)
+
+```bash
+# Change the values in the .env file to match your local setup
+nano .env
 
 # Pull the latest images
 docker compose pull
@@ -24,8 +46,18 @@ docker compose pull
 docker compose up -d
 ```
 
-## Restore a database from a dump file
+## Push to the server
+
+Replace the placeholders `[your-tenant-id]` and `[POSTGRES_PASSWORD]` with your own values. You can find the values in the `.env` file.
+
+Replace `[host]` with the IP address of the server.
 
 ```bash
-pg_restore -f mydatabase.sql /Users/b-mini/Downloads/ICP_Forests_database_empty_2025-01-29.dump 
+supabase db push --include-all --db-url postgres://postgres.[your-tenant-id]:[POSTGRES_PASSWORD]@[host]:5432/postgres
+```
+
+## Update/Reset ICP Forest Database Structure
+
+```bash
+pg_restore -f icp-db-structure.sql /path/to/your.dump 
 ```

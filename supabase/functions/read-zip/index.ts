@@ -8,6 +8,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 // https://supabase.com/blog/edge-functions-background-tasks-websockets
 import { BlobWriter, ZipReader, ZipReaderStream } from 'https://deno.land/x/zipjs/index.js'
+//import yauzl from 'npm:yauzl@2.10.0'
 
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
@@ -20,13 +21,16 @@ const supabase = createClient(
 let numFilesUploaded = 0
 
 async function processZipFile(uploadId, filepath) {
-  console.error('processZipFile 1', filepath)
-  const file = await Deno.open(filepath, { read: true })
   
-  console.error('processZipFile 2', file.readable)
+  const file = await Deno.open(filepath, { read: true })
 
+  console.error('processZipFile 1', filepath)
+  
+  const fileInfo = await file.stat();
+  console.error('fileInfo', fileInfo)
+  
   const zipReader = new ZipReader(file.readable)
-  console.error('processZipFile 3')
+
   let entries;
   try{
     console.error('entries', entries)
@@ -81,11 +85,47 @@ async function writeZipFile(filepath, stream) {
 }
 
 Deno.serve(async (req) => {
+  const uploadId = crypto.randomUUID()
+
+  const { error } = await supabase.storage.createBucket(uploadId, {
+    public: false,
+  })
+  if (error) {
+    console.log(error);
+    return new Response('failed to create bucket', {
+      status: 500,
+    })
+  }
+
+  for await (const entry of await req.body.pipeThrough(new ZipReaderStream())) {
+    // write file to Supabase Storage
+    console.log('sdfsfd');
+    const { error } = await supabase.storage
+      .from(uploadId)
+      .upload(entry.filename, entry.readable, {})
+
+    console.log('uploaded', entry.filename)
+  }
+
+  return new Response(
+    JSON.stringify({
+      uploadId,
+    }),
+    {
+      headers: {
+        'content-type': 'application/json',
+      },
+    }
+  )
+})
+/*
+Deno.serve(async (req) => {
   if (req.headers.get('content-type') !== 'application/zip') {
     return new Response('file must be a zip file', {
       status: 400,
     })
   }
+  
 
   const uploadId = crypto.randomUUID()
   await writeZipFile('/tmp/' + uploadId, req.body)
@@ -113,7 +153,7 @@ Deno.serve(async (req) => {
     }
   )
 })
-
+*/
 /* To invoke locally:
 
   1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
