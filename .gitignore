@@ -4,3 +4,5 @@ volumes/storage
 test.http
 docker-compose.override.yml
 intern
+
+supabase/seeds/*
