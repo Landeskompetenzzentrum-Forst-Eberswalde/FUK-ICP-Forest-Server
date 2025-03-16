@@ -74,9 +74,25 @@ services:
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      KONG_LUA_SSL_TRUSTED_CERTIFICATE: /etc/ssl/cert.pem
+      ACME_EMAIL: ${ACME_EMAIL}
+      # ex. testdomain.com
+      ACME_DOMAIN: ${ACME_DOMAIN}
     # https://unix.stackexchange.com/a/294837
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
 
+  kongredis:
+    container_name: supabase-redis
+    image: valkey/valkey:7.2.5
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./volumes/redis/data:/data
+      
   auth:
     container_name: supabase-auth
     image: supabase/gotrue:v2.167.0
