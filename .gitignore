@@ -7,3 +7,8 @@ intern
 
 supabase/seeds/*
 supabase/tmp
+
+node_modules
+
+processing/tmp
+processing/tmp_zip

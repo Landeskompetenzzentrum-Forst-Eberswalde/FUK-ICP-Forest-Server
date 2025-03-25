@@ -7,12 +7,19 @@ Make sure you have the following installed:
 - [Git](https://git-scm.com/downloads)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started)
+- [Node.js](https://nodejs.org/en/download/)
 
 ## Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/Landeskompetenzzentrum-Forst-Eberswalde/FUK-ICP-Forest-Server.git
+```
+
+## Get ICP data from icpf.zip
+```bash
+# Create Migrations and Seed files
+npm npm run process -- /path/to/your/icpf.zip
 ```
 
 ## Getting started (Local)

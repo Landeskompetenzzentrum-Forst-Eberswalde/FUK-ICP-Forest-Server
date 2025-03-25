@@ -59,10 +59,13 @@ services:
     volumes:
       # https://github.com/supabase/supabase/issues/12661
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
+      - ./certificates:/etc/kong/ssl
     depends_on:
       analytics:
         condition: service_healthy
     environment:
+      KONG_SSL_CERT: /etc/kong/ssl/fullchain.pem
+      KONG_SSL_CERT_KEY: /etc/kong/ssl/privkey.pem
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
@@ -74,10 +77,10 @@ services:
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
-      KONG_LUA_SSL_TRUSTED_CERTIFICATE: /etc/ssl/cert.pem
-      ACME_EMAIL: ${ACME_EMAIL}
+      #KONG_LUA_SSL_TRUSTED_CERTIFICATE: /etc/ssl/cert.pem
+      #ACME_EMAIL: ${ACME_EMAIL}
       # ex. testdomain.com
-      ACME_DOMAIN: ${ACME_DOMAIN}
+      #ACME_DOMAIN: ${ACME_DOMAIN}
     # https://unix.stackexchange.com/a/294837
     entrypoint: bash -c 'eval "echo \"$$(cat ~/temp.yml)\"" > ~/kong.yml && /docker-entrypoint.sh kong docker-start'
 
