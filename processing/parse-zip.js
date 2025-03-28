@@ -10,7 +10,6 @@ console.log('zipFilePath', zipFilePath);
 
 if (!zipFilePath) {
     console.error('Error: No zip file path provided');
-    console.log('Usage: npm run parse-zip -- /path/to/zipfile.zip');
     process.exit(1);
 }
 
